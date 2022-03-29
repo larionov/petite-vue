@@ -306,6 +306,16 @@ createApp({
 }).mount()
 ```
 
+### Custom Prefix (0.4+)
+
+By default all directives use the prefix `v-`. Sometimes it's useful to change it to somesthing else to prevent conflicts with another framework.
+
+```js
+createApp({
+  prefix: 'pv'
+}).mount()
+```
+
 ## Examples
 
 Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).

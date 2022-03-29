@@ -9,36 +9,37 @@ import { checkAttr } from './utils'
 import { ref } from './directives/ref'
 import { Context, createScopedContext } from './context'
 
-const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
 
 export let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
+  const v = ctx.prefix;
+  const dirRE = new RegExp(`^(?:${v}|:|@)`);
   const type = node.nodeType
   if (type === 1) {
     // Element
     const el = node as Element
-    if (el.hasAttribute('v-pre')) {
+    if (el.hasAttribute(`${v}pre`)) {
       return
     }
 
-    checkAttr(el, 'v-cloak')
+    checkAttr(el, `${v}cloak`)
 
     let exp: string | null
 
     // v-if
-    if ((exp = checkAttr(el, 'v-if'))) {
+    if ((exp = checkAttr(el, `${v}if`))) {
       return _if(el, exp, ctx)
     }
 
     // v-for
-    if ((exp = checkAttr(el, 'v-for'))) {
+    if ((exp = checkAttr(el, `${v}for`))) {
       return _for(el, exp, ctx)
     }
 
     // v-scope
-    if ((exp = checkAttr(el, 'v-scope')) || exp === '') {
+    if ((exp = checkAttr(el, `${v}scope`)) || exp === '') {
       const scope = exp ? evaluate(ctx.scope, exp) : {}
       ctx = createScopedContext(ctx, scope)
       if (scope.$template) {
@@ -47,7 +48,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     }
 
     // v-once
-    const hasVOnce = checkAttr(el, 'v-once') != null
+    const hasVOnce = checkAttr(el, `${v}once`) != null
     if (hasVOnce) {
       inOnce = true
     }
@@ -63,12 +64,13 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     // other directives
     const deferred: [string, string][] = []
     for (const { name, value } of [...el.attributes]) {
-      if (dirRE.test(name) && name !== 'v-cloak') {
-        if (name === 'v-model') {
+      if (dirRE.test(name) && name !== `${v}cloak`) {
+        if (name === `${v}model`) {
           // defer v-model since it relies on :value bindings to be processed
           // first, but also before v-on listeners (#73)
           deferred.unshift([name, value])
-        } else if (name[0] === '@' || /^v-on\b/.test(name)) {
+        } else if (name[0] === '@' || (new RegExp(`^${v}on\\b`).test(name))) {
+          console.log({name, value, v}, (new RegExp(`^${v}on\\b`).test(name)));
           deferred.push([name, value])
         } else {
           processDirective(el, name, value, ctx)
@@ -136,7 +138,7 @@ const processDirective = (
     arg = raw.slice(1)
   } else {
     const argIndex = raw.indexOf(':')
-    const dirName = argIndex > 0 ? raw.slice(2, argIndex) : raw.slice(2)
+    const dirName = argIndex > 0 ? raw.slice(ctx.prefix.length, argIndex) : raw.slice(ctx.prefix.length)
     dir = builtInDirectives[dirName] || ctx.dirs[dirName]
     arg = argIndex > 0 ? raw.slice(argIndex + 1) : undefined
   }

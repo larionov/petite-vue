@@ -23,6 +23,11 @@ export const createApp = (initialData?: any) => {
         'g'
       )
     }
+
+    // handle custom prefix
+    if (initialData.$prefix) {
+      ctx.prefix = initialData.$prefix;
+    }
   }
 
   // global internal helpers
@@ -30,6 +35,7 @@ export const createApp = (initialData?: any) => {
   ctx.scope.$nextTick = nextTick
   ctx.scope.$refs = Object.create(null)
 
+  const v = ctx.prefix;
   let rootBlocks: Block[]
 
   return {
@@ -54,11 +60,11 @@ export const createApp = (initialData?: any) => {
 
       el = el || document.documentElement
       let roots: Element[]
-      if (el.hasAttribute('v-scope')) {
+      if (el.hasAttribute(`${v}scope`)) {
         roots = [el]
       } else {
-        roots = [...el.querySelectorAll(`[v-scope]`)].filter(
-          (root) => !root.matches(`[v-scope] [v-scope]`)
+        roots = [...el.querySelectorAll(`[${v}scope]`)].filter(
+          (root) => !root.matches(`[${v}scope] [${v}scope]`)
         )
       }
       if (!roots.length) {
@@ -74,7 +80,7 @@ export const createApp = (initialData?: any) => {
           `Mounting on documentElement - this is non-optimal as petite-vue ` +
             `will be forced to crawl the entire page's DOM. ` +
             `Consider explicitly marking elements controlled by petite-vue ` +
-            `with \`v-scope\`.`
+            `with \`${v}scope\`.`
         )
       }
 

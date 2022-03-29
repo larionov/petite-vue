@@ -1,0 +1,15 @@
+<script type="module">
+  import { createApp } from '../src'
+  createApp({
+    $prefix: 'pv-',
+  }).mount()
+</script>
+
+<div pv-scope="{ count: 1 }">
+  <p pv-if="count">count is {{ count }}!</p>
+  <button @click="count++">increase</button>
+
+  <p pv-for="i in [1, 2, 3]" :key="i">{{ i }}</p>
+
+  <p pv-if="true">{{ count }}</p>
+</div>

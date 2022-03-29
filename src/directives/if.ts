@@ -9,12 +9,13 @@ interface Branch {
 }
 
 export const _if = (el: Element, exp: string, ctx: Context) => {
+  const v = ctx.prefix;
   if (import.meta.env.DEV && !exp.trim()) {
-    console.warn(`v-if expression cannot be empty.`)
+    console.warn(`${v}if expression cannot be empty.`)
   }
 
   const parent = el.parentElement!
-  const anchor = new Comment('v-if')
+  const anchor = new Comment(`${v}if`)
   parent.insertBefore(anchor, el)
 
   const branches: Branch[] = [
@@ -30,8 +31,8 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   while ((elseEl = el.nextElementSibling)) {
     elseExp = null
     if (
-      checkAttr(elseEl, 'v-else') === '' ||
-      (elseExp = checkAttr(elseEl, 'v-else-if'))
+      checkAttr(elseEl, `${v}else`) === '' ||
+      (elseExp = checkAttr(elseEl, `${v}else-if`))
     ) {
       parent.removeChild(elseEl)
       branches.push({ exp: elseExp, el: elseEl })

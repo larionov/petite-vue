@@ -16,13 +16,15 @@ export interface Context {
   effects: ReactiveEffectRunner[]
   cleanups: (() => void)[]
   delimiters: [string, string]
-  delimitersRE: RegExp
+  delimitersRE: RegExp,
+  prefix: string,
 }
 
 export const createContext = (parent?: Context): Context => {
   const ctx: Context = {
     delimiters: ['{{', '}}'],
     delimitersRE: /\{\{([^]+?)\}\}/g,
+    prefix: 'v-',
     ...parent,
     scope: parent ? parent.scope : reactive({}),
     dirs: parent ? parent.dirs : {},

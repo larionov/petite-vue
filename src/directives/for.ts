@@ -11,9 +11,10 @@ const destructureRE = /^[{[]\s*((?:[\w_$]+\s*,?\s*)+)[\]}]$/
 type KeyToIndexMap = Map<any, number>
 
 export const _for = (el: Element, exp: string, ctx: Context) => {
+  const v = ctx.$prefix;
   const inMatch = exp.match(forAliasRE)
   if (!inMatch) {
-    import.meta.env.DEV && console.warn(`invalid v-for expression: ${exp}`)
+    import.meta.env.DEV && console.warn(`invalid ${v}for expression: ${exp}`)
     return
   }
 
@@ -35,7 +36,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
   let keyExp =
     el.getAttribute(keyAttr) ||
     el.getAttribute((keyAttr = ':key')) ||
-    el.getAttribute((keyAttr = 'v-bind:key'))
+    el.getAttribute((keyAttr = `${v}bind:key`))
   if (keyExp) {
     el.removeAttribute(keyAttr)
     if (keyAttr === 'key') keyExp = JSON.stringify(keyExp)
@@ -129,7 +130,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
           blocks[i].remove()
         }
       }
-      
+
       const nextBlocks: Block[] = []
       let i = childCtxs.length
       let nextBlock: Block | undefined
@@ -151,7 +152,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
           if (oldIndex !== i) {
             // moved
             if (
-              blocks[oldIndex + 1] !== nextBlock || 
+              blocks[oldIndex + 1] !== nextBlock ||
               // If the next has moved, it must move too
               prevMovedBlock === nextBlock
             ) {
